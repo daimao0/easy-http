@@ -1,4 +1,4 @@
-package com.cy.easyhttp.method;
+package com.cy.easyhttp.annotation.method;
 
 import java.lang.annotation.*;
 
@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Post {
+public @interface Delete {
     /**
      * 请求路径
      */

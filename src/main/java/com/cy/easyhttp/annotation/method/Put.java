@@ -1,9 +1,9 @@
-package com.cy.easyhttp.method;
+package com.cy.easyhttp.annotation.method;
 
 import java.lang.annotation.*;
 
 /**
- * GET请求注解
+ * POST请求注解
  *
  * @author cy
  * @since v1.0.0
@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Get {
+public @interface Put {
     /**
      * 请求路径
      */

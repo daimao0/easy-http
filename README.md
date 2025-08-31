@@ -1,5 +1,11 @@
 # easy-http使用方法
-
+```xml
+        <dependency>
+            <groupId>io.github.daimao0</groupId>
+            <artifactId>easy-http</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+```
 本客户端基于okhttp3+jackson,实现将http请求定义为接口，动态代理发起请求，自动序列化请求参数，自动反序列化响应结果。
 
 通过定义接口的方式方便开发人员提供模块给第三方使用。

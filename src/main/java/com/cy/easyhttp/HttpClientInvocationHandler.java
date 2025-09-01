@@ -72,19 +72,19 @@ public class HttpClientInvocationHandler implements InvocationHandler {
         //调用请求
         if (method.isAnnotationPresent(Get.class)) {
             Map<String, String> params = buildGetParams(method, args);
-            return httpUtil.doGet(path, headers, params, method.getReturnType());
+            return httpUtil.doGet(path, headers, params, method.getGenericReturnType());
         }
         if (method.isAnnotationPresent(Post.class)) {
             Object jsonBody = buildJsonBody(method, args);
-            return httpUtil.doPost(path, headers, jsonBody, method.getReturnType());
+            return httpUtil.doPost(path, headers, jsonBody, method.getGenericReturnType());
         }
         if (method.isAnnotationPresent(Put.class)) {
             Object jsonBody = buildJsonBody(method, args);
-            return httpUtil.doPut(path, headers, jsonBody, method.getReturnType());
+            return httpUtil.doPut(path, headers, jsonBody, method.getGenericReturnType());
         }
         if (method.isAnnotationPresent(Delete.class)) {
             Map<String, String> params = buildGetParams(method, args);
-            return httpUtil.doDelete(path, headers, params, method.getReturnType());
+            return httpUtil.doDelete(path, headers, params, method.getGenericReturnType());
         }
         return null;
     }

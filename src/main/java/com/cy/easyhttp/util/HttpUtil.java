@@ -116,7 +116,7 @@ public class HttpUtil {
         HttpUrl httpUrl = Objects.requireNonNull(HttpUrl.parse(path));
 
         // 创建请求体
-        RequestBody requestBody = null;
+        RequestBody requestBody;
 
         if (body != null) {
             requestBody = new JsonRequestBody(EasySerializer.serialize(body), MediaType.parse("application/json; charset=utf-8"));

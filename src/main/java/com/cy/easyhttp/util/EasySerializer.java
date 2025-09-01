@@ -5,8 +5,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.cfg.CoercionAction;
-import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -33,12 +31,6 @@ public class EasySerializer {
 
             // 4. 包装反序列化异常（可选，通常保持默认即可）
             .configure(DeserializationFeature.WRAP_EXCEPTIONS, true);
-
-    static {
-        // 全局：允许从 String 转成各种标量类型
-        OBJECT_MAPPER.coercionConfigDefaults()
-                .setCoercion(CoercionInputShape.String, CoercionAction.TryConvert);
-    }
 
     private EasySerializer() {
     }
@@ -77,23 +69,6 @@ public class EasySerializer {
             throw new RuntimeException("JSON反序列化失败", e);
         }
     }
-
-
-    /**
-     * 将JSON字符串反序列化为对象
-     */
-    public static <T> T deserialize(String json, TypeReference<T> typeReference) {
-        if (json == null || json.isEmpty()) {
-            return null;
-        }
-
-        try {
-            return OBJECT_MAPPER.readValue(json, typeReference);
-        } catch (IOException e) {
-            throw new RuntimeException("JSON反序列化失败", e);
-        }
-    }
-
 
     /**
      * 非JSON字符串转换

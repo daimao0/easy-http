@@ -13,10 +13,14 @@ import okhttp3.OkHttpClient;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,7 +36,19 @@ public class HttpClientInvocationHandler implements InvocationHandler {
     private final Map<String, String> defaultHeaders;
     private final HttpUtil httpUtil;
     private static final Pattern PATH_VARIABLE_PATTERN = Pattern.compile("\\{([^/]+?)}");
+    private final static Set<String> JAVA_LANG_CLASS_NAMES = new HashSet<>();
 
+    static {
+        JAVA_LANG_CLASS_NAMES.add("java.lang.String");
+        JAVA_LANG_CLASS_NAMES.add("java.lang.Integer");
+        JAVA_LANG_CLASS_NAMES.add("java.lang.Long");
+        JAVA_LANG_CLASS_NAMES.add("java.lang.Short");
+        JAVA_LANG_CLASS_NAMES.add("java.lang.Byte");
+        JAVA_LANG_CLASS_NAMES.add("java.lang.Double");
+        JAVA_LANG_CLASS_NAMES.add("java.lang.Float");
+        JAVA_LANG_CLASS_NAMES.add("java.lang.Boolean");
+        JAVA_LANG_CLASS_NAMES.add("java.lang.Character");
+    }
 
     public HttpClientInvocationHandler(Class<?> clazz) {
         HttpClient annotation = clazz.getAnnotation(HttpClient.class);
@@ -217,7 +233,61 @@ public class HttpClientInvocationHandler implements InvocationHandler {
                 }
             }
         }
+        for (int i = 0; i < args.length; i++) {
+            Object arg = args[i];
+            Class<?> currentClass = arg.getClass();
+            Annotation[] annotation = annotations[i];
+
+            if (!JAVA_LANG_CLASS_NAMES.contains(currentClass.getName()) && annotation.length == 0) {
+                // 遍历当前类及其所有父类（直到Object类）
+                while (currentClass != null && currentClass != Object.class) {
+                    Field[] declaredFields = currentClass.getDeclaredFields();
+                    for (Field field : declaredFields) {
+                        String fieldName = field.getName();
+                        String getterName = buildGetterName(field);
+
+                        try {
+                            // 尝试获取并调用当前类的getter方法
+                            Object value = getFieldValue(arg, currentClass, getterName, field);
+                            if (value != null) {
+                                params.put(fieldName, String.valueOf(value));
+                            }
+                        } catch (Exception e) {
+                            // 处理异常（如无对应getter方法等）
+                            // System.err.println("无法获取字段 " + fieldName + " 的值: " + e.getMessage());
+                        }
+                    }
+                    // 移动到父类
+                    currentClass = currentClass.getSuperclass();
+                }
+            }
+        }
         return params;
+    }
+    // 工具方法：构建getter方法名
+    private static String buildGetterName(Field field) {
+        String fieldName = field.getName();
+        if (field.getType() == boolean.class || field.getType() == Boolean.class) {
+            return "is" + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+        } else {
+            return "get" + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+        }
+    }
+
+    // 工具方法：获取字段值（支持父类方法）
+    private static Object getFieldValue(Object obj, Class<?> clazz, String getterName, Field field)
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        try {
+            // 尝试调用当前类的getter方法
+            return clazz.getMethod(getterName).invoke(obj);
+        } catch (NoSuchMethodException e) {
+            // 如果当前类没有该方法，且是boolean类型，尝试getXxx()形式
+            if (field.getType() == boolean.class || field.getType() == Boolean.class) {
+                String altGetterName = "get" + Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1);
+                return clazz.getMethod(altGetterName).invoke(obj);
+            }
+            throw e;
+        }
     }
 
     /**

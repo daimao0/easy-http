@@ -3,7 +3,7 @@
         <dependency>
             <groupId>io.github.daimao0</groupId>
             <artifactId>easy-http</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.3</version>
         </dependency>
 ```
 本客户端基于okhttp3+jackson,实现将http请求定义为接口，动态代理发起请求，自动序列化请求参数，自动反序列化响应结果。

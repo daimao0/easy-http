@@ -221,6 +221,9 @@ public class HttpClientInvocationHandler implements InvocationHandler {
      * @return 返回请求中的查询参数
      */
     private Map<String, String> buildGetParams(Method method, Object[] args) {
+        if (args==null || args.length==0){
+           return new HashMap<>();
+        }
         Map<String, String> params = new HashMap<>();
         Annotation[][] annotations = method.getParameterAnnotations();
         for (int i = 0; i < annotations.length; i++) {

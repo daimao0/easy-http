@@ -15,7 +15,7 @@ public @interface HttpClient {
     /**
      * 基础URL
      */
-    String baseUrl() default "";
+    String baseUrl();
 
     /**
      * 默认请求头

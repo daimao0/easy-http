@@ -6,7 +6,7 @@
 
     <groupId>io.github.daimao0</groupId>
     <artifactId>easy-http</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.4</version>
     <name>easy-http</name>
     <description>A simple and easy-to-use HTTP client library for Java</description> <!-- 项目描述 -->
     <url>https://github.com/daimao0/easy-http</url> <!-- 项目URL -->
